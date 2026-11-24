@@ -38,11 +38,7 @@ function run(prog: Buffer, input: Buffer): { out: Buffer; code: number } {
     out.set(bytes, used);
     used += bytes.length;
   };
-  const printNum = (v: number) => {
-    const s = String(v);
-    if (used + s.length > MAX_OUT) throw new Trap(11);
-    for (let i = 0; i < s.length; i++) out[used++] = s.charCodeAt(i);
-  };
+  const printNum = (v: number) => emit(Buffer.from(String(v)));
   try {
     for (;;) {
       if (steps >= MAX_STEPS) throw new Trap(10);
@@ -113,8 +109,8 @@ function run(prog: Buffer, input: Buffer): { out: Buffer; code: number } {
 }
 
 function main(): void {
-  const inDir = process.argv[2] ?? "/input";
-  const outDir = process.argv[3] ?? "/output";
+  const inDir = process.argv[2] ?? process.env.MAKEFUN_INPUT_DIR ?? "/input";
+  const outDir = process.argv[3] ?? process.env.MAKEFUN_OUTPUT_DIR ?? "/output";
   for (const id of readdirSync(inDir).sort()) {
     const dir = join(inDir, id);
     let prog: Buffer;
